@@ -60,23 +60,41 @@ function timeAgo(iso: string) {
 }
 
 function SentimentPill({ s }: { s?: Sentiment }) {
-  const bg =
+  const style =
     s === "Positive"
-      ? "rgba(0,255,136,0.12)"
+      ? {
+          bg: "rgba(0, 255, 136, 0.22)",
+          border: "rgba(0, 255, 136, 0.55)",
+          glow: "0 0 18px rgba(0,255,136,0.22)",
+        }
       : s === "Neutral"
-      ? "rgba(255,255,255,0.08)"
+      ? {
+          bg: "rgba(255, 255, 255, 0.16)",
+          border: "rgba(255, 255, 255, 0.28)",
+          glow: "0 0 12px rgba(255,255,255,0.12)",
+        }
       : s === "Negative"
-      ? "rgba(255,80,80,0.12)"
-      : "rgba(255,255,255,0.06)";
+      ? {
+          bg: "rgba(255, 70, 70, 0.20)",
+          border: "rgba(255, 70, 70, 0.50)",
+          glow: "0 0 18px rgba(255,70,70,0.18)",
+        }
+      : {
+          bg: "rgba(255,255,255,0.10)",
+          border: "rgba(255,255,255,0.18)",
+          glow: "none",
+        };
 
   return (
     <span
       style={{
         borderRadius: 999,
-        padding: "4px 14px",
+        padding: "6px 14px",
         fontSize: 12,
-        border: "1px solid #1f1f1f",
-        background: bg,
+        fontWeight: 600,
+        border: `1px solid ${style.border}`,
+        background: style.bg,
+        boxShadow: style.glow,
         justifySelf: "end",
         width: "fit-content",
       }}
@@ -151,9 +169,11 @@ export default function Page() {
     });
   }, [feed, filter, sortKey]);
 
+  // Wider post column; smaller “Recency” and “Sentiment” to reduce wasted space.
+  const gridCols = "60px 2.25fr 0.7fr 0.7fr 0.7fr 0.55fr 0.65fr";
+
   return (
     <main className="main">
-      {/* HEADER */}
       <header style={{ marginBottom: 26 }}>
         <h1 style={{ fontSize: 32, fontWeight: 700 }}>
           Cash Bitcoin 2.0 <span className="accent">GTM Command Center</span>
@@ -166,7 +186,6 @@ export default function Page() {
         </p>
       </header>
 
-      {/* WHAT IS + SOT */}
       <section
         style={{
           display: "grid",
@@ -194,7 +213,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* KPI ROW (now 4 KPIs) */}
       <section
         style={{
           display: "grid",
@@ -224,11 +242,12 @@ export default function Page() {
 
         <div className="card">
           <div className="hint">Engagements</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{m ? formatNumber(m.engagements) : "—"}</div>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>
+            {m ? formatNumber(m.engagements) : "—"}
+          </div>
         </div>
       </section>
 
-      {/* LEADERBOARD */}
       <section className="card">
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
           {(["All", "Earned", "Creator", "Exec", "Owned"] as const).map((t) => (
@@ -239,7 +258,7 @@ export default function Page() {
                 borderRadius: 999,
                 padding: "6px 14px",
                 border: "1px solid #1f1f1f",
-                background: filter === t ? "rgba(255,136,0,0.12)" : "transparent",
+                background: filter === t ? "rgba(255,136,0,0.14)" : "transparent",
                 color: "#fff",
                 fontSize: 13,
               }}
@@ -271,7 +290,7 @@ export default function Page() {
               borderRadius: 8,
               padding: "6px 12px",
               border: "1px solid #1f1f1f",
-              background: showAll ? "rgba(255,136,0,0.12)" : "transparent",
+              background: showAll ? "rgba(255,136,0,0.14)" : "transparent",
               color: "#fff",
               fontSize: 13,
             }}
@@ -284,7 +303,7 @@ export default function Page() {
           className="hint"
           style={{
             display: "grid",
-            gridTemplateColumns: "60px 1.6fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr",
+            gridTemplateColumns: gridCols,
             gap: 16,
             paddingBottom: 10,
           }}
@@ -313,7 +332,7 @@ export default function Page() {
               rel="noreferrer"
               style={{
                 display: "grid",
-                gridTemplateColumns: "60px 1.6fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr",
+                gridTemplateColumns: gridCols,
                 gap: 16,
                 padding: "14px 0",
                 borderTop: "1px solid #121212",
@@ -324,8 +343,8 @@ export default function Page() {
             >
               <div style={{ fontWeight: 700 }}>{index + 1}</div>
 
-              <div>
-                <div style={{ fontWeight: 600 }}>{it.title}</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 600, lineHeight: 1.2 }}>{it.title}</div>
                 <div className="hint">{it.sourceName ?? it.authorName}</div>
               </div>
 
