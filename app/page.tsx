@@ -52,45 +52,51 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-// ✅ CHANGE THIS if your “real launch date” is different:
-const LAUNCH_ANCHOR_ISO = "2026-02-16T16:00:00.000Z"; // Mon of launch week (example)
-const LAUNCH_ANCHOR_MS = new Date(LAUNCH_ANCHOR_ISO).getTime();
+// ✅ Rollout window you gave me:
+const ROLLOUT_START_ISO = "2026-02-09T16:00:00.000Z"; // Mon Feb 9 (anchor)
+const ROLLOUT_END_ISO = "2026-02-18T23:59:59.000Z"; // Wed Feb 18 (end)
+const ROLLOUT_START_MS = new Date(ROLLOUT_START_ISO).getTime();
+const ROLLOUT_END_MS = new Date(ROLLOUT_END_ISO).getTime();
+const ROLLOUT_SPAN_MS = Math.max(1, ROLLOUT_END_MS - ROLLOUT_START_MS);
 
 /**
- * Normalize timestamps so the demo doesn't show "now / 3m" unless you truly have live ingestion.
- * If an item timestamp is within the last ~48 hours, we remap it into launch week.
- *
- * This keeps the dataset "hands-off" (no JSON editing) but makes Recency honest for leadership.
+ * If an item timestamp is too "fresh" (e.g., within 48 hours),
+ * remap it deterministically into the rollout window Feb 9 → Feb 18.
+ * This makes Recency honest for a “last week” GTM demo.
  */
 function normalizedTimestampISO(originalISO: string, stableIndex: number) {
   const ms = new Date(originalISO).getTime();
-  const hoursAgo = (Date.now() - ms) / (1000 * 60 * 60);
-
-  // If it's not a valid date, or it's too “fresh”, remap it into launch week.
   const invalid = Number.isNaN(ms);
+  const hoursAgo = invalid ? Infinity : (Date.now() - ms) / (1000 * 60 * 60);
   const tooFresh = hoursAgo >= 0 && hoursAgo < 48;
 
   if (invalid || tooFresh) {
-    // Spread items across ~6 days of launch week, deterministic per row.
-    const dayOffset = clamp(stableIndex % 6, 0, 6);
-    const hourOffset = (stableIndex * 3) % 24; // small spread within day
-    const remapped = LAUNCH_ANCHOR_MS + dayOffset * 24 * 60 * 60 * 1000 + hourOffset * 60 * 60 * 1000;
-    return new Date(remapped).toISOString();
+    // Deterministic spread across rollout window.
+    // This prevents every row showing the exact same day/time.
+    const step = clamp(stableIndex, 0, 200);
+    const pct = ((step * 37) % 100) / 100; // pseudo-random but stable
+    const remapped = ROLLOUT_START_MS + Math.floor(pct * ROLLOUT_SPAN_MS);
+
+    // Add a smaller "within-day" offset to vary times further
+    const extraHours = ((step * 11) % 24) * 60 * 60 * 1000;
+    const finalMs = clamp(remapped + extraHours, ROLLOUT_START_MS, ROLLOUT_END_MS);
+
+    return new Date(finalMs).toISOString();
   }
 
-  // If it's already older (e.g., real launch week data), keep it.
+  // If it's already older than 48h (e.g., truly from launch week), keep it.
   return originalISO;
 }
 
-function timeAgoFromISO(iso: string) {
+function recencyLabel(iso: string) {
   const t = new Date(iso).getTime();
-  const mins = Math.round((Date.now() - t) / 60000);
+  const diffMinutes = Math.round((Date.now() - t) / 60000);
 
-  if (mins < 60) return `${Math.max(mins, 0)}m`;
-  const hrs = Math.round(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  const days = Math.round(hrs / 24);
-  return `${days}d`;
+  if (diffMinutes < 60) return `${Math.max(diffMinutes, 0)}m`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h`;
+  const diffDays = Math.round(diffHours / 24);
+  return `${diffDays}d`;
 }
 
 function SentimentPill({ s }: { s?: Sentiment }) {
@@ -213,7 +219,7 @@ export default function Page() {
     });
   }, [feed, filter, sortKey]);
 
-  // Wider Post column; tighter Recency + Sentiment so we don’t waste space.
+  // Wider Post column; tighter Recency + Sentiment.
   const gridCols = "60px 2.35fr 0.7fr 0.7fr 0.7fr 0.50fr 0.60fr";
 
   return (
@@ -255,7 +261,10 @@ export default function Page() {
             <li>AI layer: classification + sentiment tagging (demo-mode)</li>
           </ul>
           <p className="hint" style={{ marginTop: 10 }}>
-            Launch anchor (recency): <span className="accent">{new Date(LAUNCH_ANCHOR_ISO).toDateString()}</span>
+            Rollout window (recency):{" "}
+            <span className="accent">
+              {new Date(ROLLOUT_START_ISO).toDateString()} → {new Date(ROLLOUT_END_ISO).toDateString()}
+            </span>
           </p>
         </div>
       </section>
@@ -369,9 +378,8 @@ export default function Page() {
             (it.metrics.reposts ?? 0) +
             (it.metrics.clicks ?? 0);
 
-          // ✅ Normalize display time for launch-week truthiness
           const displayISO = normalizedTimestampISO(it.timestampISO, index);
-          const recency = timeAgoFromISO(displayISO);
+          const recency = recencyLabel(displayISO);
 
           return (
             <a
@@ -389,7 +397,7 @@ export default function Page() {
                 color: "inherit",
                 alignItems: "center",
               }}
-              title={new Date(displayISO).toLocaleString()}
+              title={`Timestamp: ${new Date(displayISO).toLocaleString()}`}
             >
               <div style={{ fontWeight: 800 }}>{index + 1}</div>
 
