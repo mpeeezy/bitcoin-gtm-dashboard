@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
-import data from "@/app/data/cashBitcoin.json";
 
 export async function GET() {
-  // data is the full JSON file
-  // we only return what the UI expects: { items: [...] }
   return NextResponse.json({
-    items: (data as any).items ?? [],
+    items: [
+      {
+        id: "test-1",
+        type: "Exec",
+        platform: "X",
+        authorName: "Test Exec",
+        sourceName: "Test Exec",
+        title: "Test leaderboard entry",
+        url: "https://x.com/",
+        timestampISO: new Date().toISOString(),
+        sentiment: "Positive",
+        metrics: { impressions: 1000, likes: 100 }
+      }
+    ]
   });
 }
