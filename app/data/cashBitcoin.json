@@ -1,25 +1,158 @@
 {
-    "project": "Cash Bitcoin 2.0",
-    "launchDate": "Feb 9, 2026",
-    "mentions": 2900,
-    "impressions": 393000000,
-    "positiveSentiment": 64,
-    "engagements": 7800,
-    "openLetterViews": 950000,
-    "amaImpressions": 379500,
-    "amaEngagement": 2500,
-    "pressMentions": [
-      "Bitcoin Magazine",
-      "Cointelegraph",
-      "Yahoo Finance",
-      "Crypto Briefing",
-      "The Street"
-    ],
-    "topThemes": [
-      "Zero-fee buys",
-      "Withdrawal limits",
-      "Custody transparency",
-      "Bitcoin as spendable money",
-      "Merchant enablement"
+    "project": {
+      "name": "Cash Bitcoin 2.0",
+      "description": "GTM command center demo dataset across Exec, Earned, Owned, and Creator channels.",
+      "ownedOpenLetterUrl": "https://cash.app/press/cash-bitcoin-updates-fees-withdrawals"
+    },
+    "items": [
+      {
+        "id": "owned-open-letter",
+        "type": "Owned",
+        "platform": "Web",
+        "authorName": "Cash App",
+        "sourceName": "Cash App Press",
+        "title": "Open Letter: Updates to Bitcoin Fees and Withdrawals",
+        "url": "https://cash.app/press/cash-bitcoin-updates-fees-withdrawals",
+        "timestampISO": "2026-02-23T18:30:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "clicks": 1200 }
+      },
+  
+      {
+        "id": "exec-miles-1",
+        "type": "Exec",
+        "platform": "X",
+        "authorName": "Miles Suter",
+        "sourceName": "Miles Suter",
+        "title": "Cash Bitcoin 2.0 launch: making bitcoin cheaper + easier on Cash App",
+        "url": "https://x.com/milessuter/status/2021025597187883027?s=20",
+        "timestampISO": "2026-02-23T18:45:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 210000, "likes": 3400, "replies": 220, "reposts": 610 }
+      },
+      {
+        "id": "exec-ir-1",
+        "type": "Exec",
+        "platform": "X",
+        "authorName": "IR",
+        "sourceName": "IR",
+        "title": "Bitcoin improvements on Cash App: fees + withdrawals updates",
+        "url": "https://x.com/emcross23/status/2021024238082384019",
+        "timestampISO": "2026-02-23T18:55:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 120000, "likes": 1800, "replies": 90, "reposts": 240 }
+      },
+      {
+        "id": "exec-thomas-1",
+        "type": "Exec",
+        "platform": "X",
+        "authorName": "Thomas Templeton",
+        "sourceName": "Thomas Templeton",
+        "title": "Cash App bitcoin updates: smoother onramps + withdrawals",
+        "url": "https://x.com/templetonthomas/status/2021033154350547314?s=20",
+        "timestampISO": "2026-02-23T19:05:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 95000, "likes": 1400, "replies": 70, "reposts": 180 }
+      },
+      {
+        "id": "exec-jack-1",
+        "type": "Exec",
+        "platform": "X",
+        "authorName": "Jack",
+        "sourceName": "Jack",
+        "title": "Cash App’s bitcoin experience just got better",
+        "url": "https://x.com/jack/status/2021049356280004999?s=20",
+        "timestampISO": "2026-02-23T19:15:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 900000, "likes": 15000, "replies": 1200, "reposts": 3200 }
+      },
+  
+      {
+        "id": "earned-yahoo-1",
+        "type": "Earned",
+        "platform": "Web",
+        "authorName": "Yahoo Finance",
+        "sourceName": "Yahoo Finance",
+        "title": "Cash App updates bitcoin fees + withdrawals",
+        "url": "https://cash.app/press/cash-bitcoin-updates-fees-withdrawals",
+        "timestampISO": "2026-02-23T19:20:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "clicks": 1200 }
+      },
+      {
+        "id": "earned-cointelegraph-1",
+        "type": "Earned",
+        "platform": "Web",
+        "authorName": "Cointelegraph",
+        "sourceName": "Cointelegraph",
+        "title": "Cash App improves bitcoin access with new fee + withdrawal updates",
+        "url": "https://cointelegraph.com/",
+        "timestampISO": "2026-02-23T19:22:26.137Z",
+        "sentiment": "Neutral",
+        "metrics": { "clicks": 640 }
+      },
+      {
+        "id": "earned-btc-mag-1",
+        "type": "Earned",
+        "platform": "X",
+        "authorName": "Bitcoin Magazine",
+        "authorHandle": "@BitcoinMagazine",
+        "sourceName": "Bitcoin Magazine",
+        "title": "Cash App makes bitcoin more accessible with updated fees/withdrawals",
+        "url": "https://x.com/",
+        "timestampISO": "2026-02-23T19:25:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 180000, "likes": 2200, "replies": 180, "reposts": 460 }
+      },
+      {
+        "id": "earned-cryptobriefing-1",
+        "type": "Earned",
+        "platform": "Web",
+        "authorName": "Crypto Briefing",
+        "sourceName": "Crypto Briefing",
+        "title": "Cash App tweaks bitcoin withdrawals and fees",
+        "url": "https://cryptobriefing.com/",
+        "timestampISO": "2026-02-23T19:27:26.137Z",
+        "sentiment": "Neutral",
+        "metrics": { "clicks": 410 }
+      },
+  
+      {
+        "id": "creator-nostr-1",
+        "type": "Creator",
+        "platform": "Nostr",
+        "authorName": "Bitcoin builder",
+        "sourceName": "Nostr",
+        "title": "Cash App shipping bitcoin updates — worth watching",
+        "url": "https://nostr.com/",
+        "timestampISO": "2026-02-23T19:28:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "likes": 88, "replies": 12, "reposts": 24 }
+      },
+      {
+        "id": "creator-x-1",
+        "type": "Creator",
+        "platform": "X",
+        "authorName": "Bitcoin creator",
+        "sourceName": "X",
+        "title": "Open letter is a strong move. Better bitcoin UX matters.",
+        "url": "https://x.com/",
+        "timestampISO": "2026-02-23T19:29:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 54000, "likes": 620, "replies": 41, "reposts": 120 }
+      },
+  
+      {
+        "id": "owned-cashapp-x-1",
+        "type": "Owned",
+        "platform": "X",
+        "authorName": "Cash App",
+        "sourceName": "Cash App",
+        "title": "We updated bitcoin fees + withdrawals. Details in the Open Letter.",
+        "url": "https://x.com/",
+        "timestampISO": "2026-02-23T19:30:26.137Z",
+        "sentiment": "Positive",
+        "metrics": { "impressions": 320000, "likes": 4100, "replies": 330, "reposts": 900 }
+      }
     ]
   }
