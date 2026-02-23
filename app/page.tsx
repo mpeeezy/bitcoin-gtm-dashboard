@@ -95,17 +95,25 @@ export default function Page() {
   const [lastUpdated, setLastUpdated] = useState<string>("");
 
   async function fetchMetrics() {
-    const res = await fetch("/api/metrics", { cache: "no-store" });
-    const json = await res.json();
-    setMetrics(json);
-    setLastUpdated(new Date().toLocaleTimeString());
+    try {
+      const res = await fetch("/api/metrics", { cache: "no-store" });
+      const json = await res.json();
+      setMetrics(json);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch (e) {
+      console.error("fetchMetrics error", e);
+    }
   }
 
   async function fetchFeed() {
-    const res = await fetch("/api/feed", { cache: "no-store" });
-    const json = await res.json();
-    setFeed(json);
-    setLastUpdated(new Date().toLocaleTimeString());
+    try {
+      const res = await fetch("/api/feed", { cache: "no-store" });
+      const json = await res.json();
+      setFeed(json);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch (e) {
+      console.error("fetchFeed error", e);
+    }
   }
 
   useEffect(() => {
@@ -186,32 +194,37 @@ export default function Page() {
         </div>
       </section>
 
-      {/* KPI ROW */}
+      {/* KPI ROW (now 4 KPIs) */}
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3,1fr)",
+          gridTemplateColumns: "repeat(4,1fr)",
           gap: 24,
           marginBottom: 26,
         }}
       >
         <div className="card">
           <div className="hint">Mentions</div>
-          <div style={{ fontSize: 32, fontWeight: 700 }}>{m ? formatNumber(m.mentions) : "—"}</div>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>{m ? formatNumber(m.mentions) : "—"}</div>
         </div>
 
         <div className="card">
           <div className="hint">Impressions</div>
-          <div style={{ fontSize: 32, fontWeight: 700 }}>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>
             {m ? formatNumber(m.impressions) : "—"}
           </div>
         </div>
 
         <div className="card">
           <div className="hint">Positive Sentiment</div>
-          <div className="accent" style={{ fontSize: 32, fontWeight: 700 }}>
+          <div className="accent" style={{ fontSize: 28, fontWeight: 700 }}>
             {m ? `${m.positiveSentiment}%` : "—"}
           </div>
+        </div>
+
+        <div className="card">
+          <div className="hint">Engagements</div>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>{m ? formatNumber(m.engagements) : "—"}</div>
         </div>
       </section>
 

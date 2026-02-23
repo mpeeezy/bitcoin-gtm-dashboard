@@ -17,7 +17,6 @@
         "sentiment": "Positive",
         "metrics": { "clicks": 1200 }
       },
-  
       {
         "id": "exec-miles-1",
         "type": "Exec",
@@ -66,7 +65,6 @@
         "sentiment": "Positive",
         "metrics": { "impressions": 900000, "likes": 15000, "replies": 1200, "reposts": 3200 }
       },
-  
       {
         "id": "earned-yahoo-1",
         "type": "Earned",
@@ -116,7 +114,6 @@
         "sentiment": "Neutral",
         "metrics": { "clicks": 410 }
       },
-  
       {
         "id": "creator-nostr-1",
         "type": "Creator",
@@ -141,7 +138,6 @@
         "sentiment": "Positive",
         "metrics": { "impressions": 54000, "likes": 620, "replies": 41, "reposts": 120 }
       },
-  
       {
         "id": "owned-cashapp-x-1",
         "type": "Owned",
