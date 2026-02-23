@@ -1,0 +1,25 @@
+{
+    "project": "Cash Bitcoin 2.0",
+    "launchDate": "Feb 9, 2026",
+    "mentions": 2900,
+    "impressions": 393000000,
+    "positiveSentiment": 64,
+    "engagements": 7800,
+    "openLetterViews": 950000,
+    "amaImpressions": 379500,
+    "amaEngagement": 2500,
+    "pressMentions": [
+      "Bitcoin Magazine",
+      "Cointelegraph",
+      "Yahoo Finance",
+      "Crypto Briefing",
+      "The Street"
+    ],
+    "topThemes": [
+      "Zero-fee buys",
+      "Withdrawal limits",
+      "Custody transparency",
+      "Bitcoin as spendable money",
+      "Merchant enablement"
+    ]
+  }
