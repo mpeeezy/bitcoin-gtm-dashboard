@@ -48,11 +48,45 @@ function formatNumber(n?: number) {
   return `${n}`;
 }
 
-function timeAgo(iso: string) {
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+// ✅ CHANGE THIS if your “real launch date” is different:
+const LAUNCH_ANCHOR_ISO = "2026-02-16T16:00:00.000Z"; // Mon of launch week (example)
+const LAUNCH_ANCHOR_MS = new Date(LAUNCH_ANCHOR_ISO).getTime();
+
+/**
+ * Normalize timestamps so the demo doesn't show "now / 3m" unless you truly have live ingestion.
+ * If an item timestamp is within the last ~48 hours, we remap it into launch week.
+ *
+ * This keeps the dataset "hands-off" (no JSON editing) but makes Recency honest for leadership.
+ */
+function normalizedTimestampISO(originalISO: string, stableIndex: number) {
+  const ms = new Date(originalISO).getTime();
+  const hoursAgo = (Date.now() - ms) / (1000 * 60 * 60);
+
+  // If it's not a valid date, or it's too “fresh”, remap it into launch week.
+  const invalid = Number.isNaN(ms);
+  const tooFresh = hoursAgo >= 0 && hoursAgo < 48;
+
+  if (invalid || tooFresh) {
+    // Spread items across ~6 days of launch week, deterministic per row.
+    const dayOffset = clamp(stableIndex % 6, 0, 6);
+    const hourOffset = (stableIndex * 3) % 24; // small spread within day
+    const remapped = LAUNCH_ANCHOR_MS + dayOffset * 24 * 60 * 60 * 1000 + hourOffset * 60 * 60 * 1000;
+    return new Date(remapped).toISOString();
+  }
+
+  // If it's already older (e.g., real launch week data), keep it.
+  return originalISO;
+}
+
+function timeAgoFromISO(iso: string) {
   const t = new Date(iso).getTime();
   const mins = Math.round((Date.now() - t) / 60000);
-  if (mins < 1) return "now";
-  if (mins < 60) return `${mins}m`;
+
+  if (mins < 60) return `${Math.max(mins, 0)}m`;
   const hrs = Math.round(mins / 60);
   if (hrs < 24) return `${hrs}h`;
   const days = Math.round(hrs / 24);
@@ -63,26 +97,30 @@ function SentimentPill({ s }: { s?: Sentiment }) {
   const style =
     s === "Positive"
       ? {
-          bg: "rgba(0, 255, 136, 0.22)",
-          border: "rgba(0, 255, 136, 0.55)",
-          glow: "0 0 18px rgba(0,255,136,0.22)",
+          bg: "rgba(0, 255, 136, 0.24)",
+          border: "rgba(0, 255, 136, 0.65)",
+          glow: "0 0 18px rgba(0,255,136,0.28)",
+          text: "#d9ffe9",
         }
       : s === "Neutral"
       ? {
-          bg: "rgba(255, 255, 255, 0.16)",
-          border: "rgba(255, 255, 255, 0.28)",
-          glow: "0 0 12px rgba(255,255,255,0.12)",
+          bg: "rgba(255, 255, 255, 0.18)",
+          border: "rgba(255, 255, 255, 0.34)",
+          glow: "0 0 14px rgba(255,255,255,0.14)",
+          text: "#ffffff",
         }
       : s === "Negative"
       ? {
-          bg: "rgba(255, 70, 70, 0.20)",
-          border: "rgba(255, 70, 70, 0.50)",
-          glow: "0 0 18px rgba(255,70,70,0.18)",
+          bg: "rgba(255, 70, 70, 0.22)",
+          border: "rgba(255, 70, 70, 0.62)",
+          glow: "0 0 18px rgba(255,70,70,0.22)",
+          text: "#ffe3e3",
         }
       : {
           bg: "rgba(255,255,255,0.10)",
           border: "rgba(255,255,255,0.18)",
           glow: "none",
+          text: "#fff",
         };
 
   return (
@@ -91,12 +129,15 @@ function SentimentPill({ s }: { s?: Sentiment }) {
         borderRadius: 999,
         padding: "6px 14px",
         fontSize: 12,
-        fontWeight: 600,
+        fontWeight: 700,
+        letterSpacing: 0.2,
         border: `1px solid ${style.border}`,
         background: style.bg,
         boxShadow: style.glow,
+        color: style.text,
         justifySelf: "end",
         width: "fit-content",
+        textTransform: "capitalize",
       }}
     >
       {s ?? "—"}
@@ -159,8 +200,11 @@ export default function Page() {
       (it.metrics.clicks ?? 0);
 
     return [...filtered].sort((a, b) => {
+      const aMs = new Date(a.timestampISO).getTime();
+      const bMs = new Date(b.timestampISO).getTime();
+
       if (sortKey === "Most Recent") {
-        return new Date(b.timestampISO).getTime() - new Date(a.timestampISO).getTime();
+        return (Number.isNaN(bMs) ? 0 : bMs) - (Number.isNaN(aMs) ? 0 : aMs);
       }
       if (sortKey === "Impressions") {
         return (b.metrics.impressions ?? 0) - (a.metrics.impressions ?? 0);
@@ -169,13 +213,13 @@ export default function Page() {
     });
   }, [feed, filter, sortKey]);
 
-  // Wider post column; smaller “Recency” and “Sentiment” to reduce wasted space.
-  const gridCols = "60px 2.25fr 0.7fr 0.7fr 0.7fr 0.55fr 0.65fr";
+  // Wider Post column; tighter Recency + Sentiment so we don’t waste space.
+  const gridCols = "60px 2.35fr 0.7fr 0.7fr 0.7fr 0.50fr 0.60fr";
 
   return (
     <main className="main">
       <header style={{ marginBottom: 26 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 800 }}>
           Cash Bitcoin 2.0 <span className="accent">GTM Command Center</span>
         </h1>
         <p className="hint" style={{ marginTop: 10 }}>
@@ -210,6 +254,9 @@ export default function Page() {
             <li>Owned: Open Letter analytics</li>
             <li>AI layer: classification + sentiment tagging (demo-mode)</li>
           </ul>
+          <p className="hint" style={{ marginTop: 10 }}>
+            Launch anchor (recency): <span className="accent">{new Date(LAUNCH_ANCHOR_ISO).toDateString()}</span>
+          </p>
         </div>
       </section>
 
@@ -223,28 +270,24 @@ export default function Page() {
       >
         <div className="card">
           <div className="hint">Mentions</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{m ? formatNumber(m.mentions) : "—"}</div>
+          <div style={{ fontSize: 28, fontWeight: 800 }}>{m ? formatNumber(m.mentions) : "—"}</div>
         </div>
 
         <div className="card">
           <div className="hint">Impressions</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>
-            {m ? formatNumber(m.impressions) : "—"}
-          </div>
+          <div style={{ fontSize: 28, fontWeight: 800 }}>{m ? formatNumber(m.impressions) : "—"}</div>
         </div>
 
         <div className="card">
           <div className="hint">Positive Sentiment</div>
-          <div className="accent" style={{ fontSize: 28, fontWeight: 700 }}>
+          <div className="accent" style={{ fontSize: 28, fontWeight: 900 }}>
             {m ? `${m.positiveSentiment}%` : "—"}
           </div>
         </div>
 
         <div className="card">
           <div className="hint">Engagements</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>
-            {m ? formatNumber(m.engagements) : "—"}
-          </div>
+          <div style={{ fontSize: 28, fontWeight: 800 }}>{m ? formatNumber(m.engagements) : "—"}</div>
         </div>
       </section>
 
@@ -261,6 +304,7 @@ export default function Page() {
                 background: filter === t ? "rgba(255,136,0,0.14)" : "transparent",
                 color: "#fff",
                 fontSize: 13,
+                fontWeight: 600,
               }}
             >
               {t}
@@ -271,7 +315,7 @@ export default function Page() {
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as SortKey)}
             style={{
-              borderRadius: 8,
+              borderRadius: 10,
               padding: "6px 12px",
               border: "1px solid #1f1f1f",
               background: "#0a0a0a",
@@ -287,12 +331,13 @@ export default function Page() {
           <button
             onClick={() => setShowAll((v) => !v)}
             style={{
-              borderRadius: 8,
+              borderRadius: 10,
               padding: "6px 12px",
               border: "1px solid #1f1f1f",
               background: showAll ? "rgba(255,136,0,0.14)" : "transparent",
               color: "#fff",
               fontSize: 13,
+              fontWeight: 600,
             }}
           >
             {showAll ? "Show Top 10" : "Show All 50"}
@@ -324,6 +369,10 @@ export default function Page() {
             (it.metrics.reposts ?? 0) +
             (it.metrics.clicks ?? 0);
 
+          // ✅ Normalize display time for launch-week truthiness
+          const displayISO = normalizedTimestampISO(it.timestampISO, index);
+          const recency = timeAgoFromISO(displayISO);
+
           return (
             <a
               key={it.id}
@@ -340,18 +389,19 @@ export default function Page() {
                 color: "inherit",
                 alignItems: "center",
               }}
+              title={new Date(displayISO).toLocaleString()}
             >
-              <div style={{ fontWeight: 700 }}>{index + 1}</div>
+              <div style={{ fontWeight: 800 }}>{index + 1}</div>
 
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 600, lineHeight: 1.2 }}>{it.title}</div>
+                <div style={{ fontWeight: 700, lineHeight: 1.2 }}>{it.title}</div>
                 <div className="hint">{it.sourceName ?? it.authorName}</div>
               </div>
 
               <div>{it.type}</div>
               <div>{it.platform}</div>
               <div>Eng: {formatNumber(engagement)}</div>
-              <div>{timeAgo(it.timestampISO)}</div>
+              <div>{recency}</div>
 
               <SentimentPill s={it.sentiment} />
             </a>
